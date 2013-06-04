@@ -14,6 +14,7 @@ body {
 	background: #444;
 	color: #ddd;
 	font-size: 12px;
+	font-family: sans-serif;
 }
 .col {
 	position: fixed;
@@ -47,6 +48,31 @@ body {
 #preview {
 	padding: 4px;
 	overflow: auto;
+}
+#preview a {
+	color: #db2;
+	text-decoration: none;
+	border-bottom: 1px solid rgba(136, 136, 136, 0.3);
+}
+#preview a:hover {
+	color: #dd2;
+}
+#preview a:active {
+	position: relative;
+	outline: none;
+	top: 1px;
+	color: #dd2;
+}
+#preview pre {
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	background-color: rgba(136, 136, 136, 0.2);
+	border-radius: 2px;
+	padding: 10px 15px 10px 15px;
+	margin: 15px;
 }
 		</style>
 		<script type="text/javascript" src="marked.js"></script>
