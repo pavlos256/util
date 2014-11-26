@@ -154,27 +154,39 @@ You can find this editor on [Github](https://github.com/pavlos256/util/tree/gh-p
 				<div></div>
 				<input id="chkHtmlWrap" type="checkbox" name="chkHtmlWrap" disabled checked>
 				<label for="chkHtmlWrap">Surround HTML body</label>
+				<hr>
+				<input id="chkHighlight" type="checkbox" name="chkHighlight">
+				<label for="chkHighlight">Syntax highlighting</label>
 			</div>
 		</div>
 
 		<script type="text/javascript">
 if (marked)
 {
+	var source = document.getElementById("source"),
+		preview = document.getElementById("preview"),
+		htmlPreview = document.getElementById("htmlPreview"),
+		chkOutputType = document.getElementById("chkOutputType"),
+		chkHtmlWrap = document.getElementById("chkHtmlWrap"),
+		chkHighlight = document.getElementById("chkHighlight");
+
 	var opts = {
 		sanitize: true,
 		gfm: true,
 		pedantic: false,
 		tables: true,
-		smartLists: true
+		smartLists: true,
+		highlight: function(code) {
+			if (chkHighlight.checked && ("hljs" in window))
+				return hljs.highlightAuto(code).value;
+			return code;
+		}
 	};
 
 	var htmlExport = {
 		prefix: "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t\t<title>Document</title>\n\t</head>\n\t<body>\n",
 		suffix: "\t</body>\n</html>\n"
 	};
-
-	var source = document.getElementById("source"), preview = document.getElementById("preview"), htmlPreview = document.getElementById("htmlPreview"), 
-		chkOutputType = document.getElementById("chkOutputType"), chkHtmlWrap = document.getElementById("chkHtmlWrap");
 
 	source.select();
 
@@ -210,6 +222,44 @@ if (marked)
 		update();
 	}, false);
 	chkHtmlWrap.addEventListener("change", update, false);
+
+	function enableHighlight(callback)
+	{
+		if (!("hljs" in window))
+		{
+			var head = document.getElementsByTagName("head")[0];
+			var link = document.createElement("link");
+			link.rel = "stylesheet";
+			link.href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/ir_black.min.css";
+			head.appendChild(link);
+			var script = document.createElement("script");
+			script.src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js";
+			// Script loader from jQuery.getScript
+			var done = false;
+			script.onload = script.onreadystatechange = function() {
+				if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
+					done = true;
+					script.onload = script.onreadystatechange = null;
+					if (head && script.parentNode)
+						head.removeChild(script);
+
+					callback();
+				}
+			};
+			head.appendChild(script);
+		}
+		else
+			callback();
+	}
+	function handleHighlight()
+	{
+		if (chkHighlight.checked)
+			enableHighlight(update);
+		else
+			update();
+	}
+	chkHighlight.addEventListener("change", handleHighlight, false);
+	handleHighlight();
 }
 		</script>
 	</body>
