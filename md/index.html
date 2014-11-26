@@ -153,18 +153,24 @@ You can find this editor on [Github](https://github.com/pavlos256/util/tree/gh-p
 				<label for="chkOutputType">Show HTML</label>
 				<div></div>
 				<input id="chkHtmlWrap" type="checkbox" name="chkHtmlWrap" disabled checked>
-				<label for="chkHtmlWrap">Surround HTML body</label>
+				<label for="chkHtmlWrap">...with document markup</label>
+				<div></div>
+				<input id="chkHtmlStyles" type="checkbox" name="chkHtmlStyles" disabled checked>
+				<label for="chkHtmlStyles">...and CSS styles</label>
 			</div>
 		</div>
 
 		<script type="text/javascript">
 if (marked)
 {
+	const hlStyleSheet = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/ir_black.min.css";
+
 	var source = document.getElementById("source"),
 		preview = document.getElementById("preview"),
 		htmlPreview = document.getElementById("htmlPreview"),
 		chkOutputType = document.getElementById("chkOutputType"),
 		chkHtmlWrap = document.getElementById("chkHtmlWrap"),
+		chkHtmlStyles = document.getElementById("chkHtmlStyles"),
 		chkHighlight = document.getElementById("chkHighlight");
 
 	var opts = {
@@ -181,25 +187,47 @@ if (marked)
 	};
 
 	var htmlExport = {
-		prefix: "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t\t<title>Document</title>\n\t</head>\n\t<body>\n",
+		prefixDoc: "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t\t<title>Document</title>\n",
+		prefixInHeadInline: "\t\t<style type=\"text/css\">"
+						+ "body { background: #222; color: #ddd; font-size: 12px; font-family: sans-serif; }"
+						+ "a { color: #dc2; text-decoration: none; border-bottom: 1px solid rgba(136, 136, 136, 0.3); }"
+						+ "a:hover { color: #ed2; }"
+						+ "a:active { color: #fa2; }"
+						+ "pre { white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; white-space: pre-wrap; word-wrap: break-word; background-color: rgba(136, 136, 136, 0.2); border-radius: 2px; border: 1px solid #000; padding: 10px 15px 10px 15px; margin: 15px; }"
+						+ "table { border-collapse: collapse; border-spacing: 0; }"
+						+ "td, th { vertical-align: top; padding: 4px 10px; border: 1px solid #bbb; }"
+						+ "</style>\n",
+		prefixInHeadHL: "\t\t<link rel=\"stylesheet\" href=\"" + hlStyleSheet + "\">\n",
+		prefixEndHead: "\t</head>\n\t<body>\n",
 		suffix: "\t</body>\n</html>\n"
 	};
 
 	source.select();
 
-	function getHtml(htmlWrap)
+	function getHtml(htmlWrap, includeCss, syntaxHighlight)
 	{
 		var html = marked(source.value, opts);
 
 		if (htmlWrap)
-			html = htmlExport.prefix + html + htmlExport.suffix;
+		{
+			var s = htmlExport.prefixDoc;
+			if (includeCss)
+				s += htmlExport.prefixInHeadInline;
+			if (syntaxHighlight)
+				s += htmlExport.prefixInHeadHL;
+			s += htmlExport.prefixEndHead;
+			s += html;
+			s += htmlExport.suffix;
+
+			html = s;
+		}
 
 		return html;
 	}
 
 	function update()
 	{
-		var html = getHtml(chkOutputType.checked && chkHtmlWrap.checked);
+		var html = getHtml(chkOutputType.checked && chkHtmlWrap.checked, chkHtmlStyles.checked, chkHighlight.checked);
 
 		if (chkOutputType.checked)
 			htmlPreview.value = html;
@@ -210,8 +238,22 @@ if (marked)
 	function handleOutputType(doUpdate)
 	{
 		chkHtmlWrap.disabled = !chkOutputType.checked;
+		handleHtmlWrap(false);
 		preview.style.display = chkOutputType.checked ? "none" : "";
 		htmlPreview.style.display = !chkOutputType.checked ? "none" : "";
+		if (doUpdate)
+			update();
+	}
+
+	function handleHtmlWrap(doUpdate)
+	{
+		chkHtmlStyles.disabled = !chkHtmlWrap.checked || chkHtmlWrap.disabled;
+		if (doUpdate)
+			update();
+	}
+
+	function handleHtmlStyles(doUpdate)
+	{
 		if (doUpdate)
 			update();
 	}
@@ -223,7 +265,7 @@ if (marked)
 			var head = document.getElementsByTagName("head")[0];
 			var link = document.createElement("link");
 			link.rel = "stylesheet";
-			link.href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/ir_black.min.css";
+			link.href = hlStyleSheet;
 			head.appendChild(link);
 			var script = document.createElement("script");
 			script.src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js";
@@ -255,7 +297,8 @@ if (marked)
 	source.addEventListener("input", update, false);
 	source.addEventListener("propertychange", update, false);
 	chkOutputType.addEventListener("change", function() { handleOutputType(true); }, false);
-	chkHtmlWrap.addEventListener("change", update, false);
+	chkHtmlWrap.addEventListener("change", function() { handleHtmlWrap(true); }, false);
+	chkHtmlStyles.addEventListener("change", function() { handleHtmlStyles(true); }, false);
 	chkHighlight.addEventListener("change", handleHighlight, false);
 
 	handleOutputType(false);
