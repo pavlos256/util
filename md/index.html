@@ -100,7 +100,50 @@ body {
 	</head>
 	<body>
 		<div class="left col">
-			<textarea id="source" class="source" name="text" rows="10" spellcheck="true" autofocus>Type markdown here</textarea>
+			<textarea id="source" class="source" name="text" rows="10" spellcheck="true" autofocus># Markdown Editor
+
+A simple Markdown editor, built using the wonderful [marked](https://github.com/chjj/marked) parser.
+
+Basic useful feature list:
+
+ * Fast and small
+ * Works locally (with no web server) or online
+ * Github-flavored Markdown
+ * Exports HTML to easily create .html files
+
+## Examples
+
+1. This is a numbered list
+2. The second list item
+    1. Inside
+    2. More
+3. Continued
+
+Tables are possible too:
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Value 1  | Value 2  |
+
+and they look great in text too.
+
+Code blocks (with backticks and syntax highlighting where available):
+
+```javascript
+var opts = {
+	sanitize: true,
+	gfm: true,
+	pedantic: false,
+	tables: true,
+	smartLists: true
+};
+```
+
+Code blocks with 4 spaces:
+
+    $ sudo pacman -Syu
+
+You can find this editor on [Github](https://github.com/pavlos256/util/tree/gh-pages/md).</textarea>
 		</div>
 		<div class="right col">
 			<div id="preview"></div>
