@@ -1,2 +1,2 @@
 # Markdown editor
-Dead-simple markdown editor using [marked](http://https://github.com/chjj/marked).
+Dead-simple markdown editor using [marked](https://github.com/chjj/marked).
