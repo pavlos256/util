@@ -207,18 +207,14 @@ if (marked)
 			preview.innerHTML = html;
 	}
 
-	source.addEventListener("input", update, false);
-	source.addEventListener("propertychange", update, false);
-	update();
-
-	chkOutputType.addEventListener("change", function() {
+	function handleOutputType(doUpdate)
+	{
 		chkHtmlWrap.disabled = !chkOutputType.checked;
 		preview.style.display = chkOutputType.checked ? "none" : "";
 		htmlPreview.style.display = !chkOutputType.checked ? "none" : "";
-
-		update();
-	}, false);
-	chkHtmlWrap.addEventListener("change", update, false);
+		if (doUpdate)
+			update();
+	}
 
 	function enableHighlight(callback)
 	{
@@ -255,7 +251,14 @@ if (marked)
 		else
 			update();
 	}
+
+	source.addEventListener("input", update, false);
+	source.addEventListener("propertychange", update, false);
+	chkOutputType.addEventListener("change", function() { handleOutputType(true); }, false);
+	chkHtmlWrap.addEventListener("change", update, false);
 	chkHighlight.addEventListener("change", handleHighlight, false);
+
+	handleOutputType(false);
 	handleHighlight();
 }
 		</script>
