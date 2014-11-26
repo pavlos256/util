@@ -79,7 +79,7 @@ body {
 	</head>
 	<body>
 		<div class="left col">
-			<textarea id="source" name="text" rows="10" spellcheck="true">Type markdown here</textarea>
+			<textarea id="source" name="text" rows="10" spellcheck="true" autofocus>Type markdown here</textarea>
 		</div>
 		<div class="right col" id="preview"></div>
 
@@ -94,6 +94,7 @@ if (marked)
 		smartLists: true
 	};
 	var source = document.getElementById("source"), preview = document.getElementById("preview");
+	source.select();
 	function update()
 	{
 		preview.innerHTML = marked(source.value, opts);
