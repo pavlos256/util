@@ -33,7 +33,18 @@ body {
 	left: calc(50% + 8px);
 	right: 8px;
 }
-#source {
+.controls {
+	position: fixed;
+	right: 10px;
+	top: 10px;
+	padding: 8px;
+	background: rgba(0, 0, 0, 0.75);
+	display: none;
+}
+.right.col:hover .controls {
+	display: block;
+}
+.source {
 	background: inherit;
 	color: inherit;
 	width: 100%;
@@ -89,9 +100,19 @@ body {
 	</head>
 	<body>
 		<div class="left col">
-			<textarea id="source" name="text" rows="10" spellcheck="true" autofocus>Type markdown here</textarea>
+			<textarea id="source" class="source" name="text" rows="10" spellcheck="true" autofocus>Type markdown here</textarea>
 		</div>
-		<div class="right col" id="preview"></div>
+		<div class="right col">
+			<div id="preview"></div>
+			<textarea id="htmlPreview" class="source" name="text" rows="10" spellcheck="false" style="display:none"></textarea>
+			<div class="controls">
+				<input id="chkOutputType" type="checkbox" name="chkOutputType">
+				<label for="chkOutputType">Show HTML</label>
+				<div></div>
+				<input id="chkHtmlWrap" type="checkbox" name="chkHtmlWrap" disabled>
+				<label for="chkHtmlWrap">Surround HTML body</label>
+			</div>
+		</div>
 
 		<script type="text/javascript">
 if (marked)
@@ -103,15 +124,49 @@ if (marked)
 		tables: true,
 		smartLists: true
 	};
-	var source = document.getElementById("source"), preview = document.getElementById("preview");
+
+	var htmlExport = {
+		prefix: "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t\t<title>Document</title>\n\t</head>\n\t<body>",
+		suffix: "\t</body>\n</html>\n"
+	};
+
+	var source = document.getElementById("source"), preview = document.getElementById("preview"), htmlPreview = document.getElementById("htmlPreview"), 
+		chkOutputType = document.getElementById("chkOutputType"), chkHtmlWrap = document.getElementById("chkHtmlWrap");
+
 	source.select();
+
+	function getHtml(htmlWrap)
+	{
+		var html = marked(source.value, opts);
+
+		if (htmlWrap)
+			html = htmlExport.prefix + html + htmlExport.suffix;
+
+		return html;
+	}
+
 	function update()
 	{
-		preview.innerHTML = marked(source.value, opts);
+		var html = getHtml(chkOutputType.checked && chkHtmlWrap.checked);
+
+		if (chkOutputType.checked)
+			htmlPreview.value = html;
+		else
+			preview.innerHTML = html;
 	}
+
 	source.addEventListener("input", update, false);
 	source.addEventListener("propertychange", update, false);
 	update();
+
+	chkOutputType.addEventListener("change", function() {
+		chkHtmlWrap.disabled = !chkOutputType.checked;
+		preview.style.display = chkOutputType.checked ? "none" : "";
+		htmlPreview.style.display = !chkOutputType.checked ? "none" : "";
+
+		update();
+	}, false);
+	chkHtmlWrap.addEventListener("change", update, false);
 }
 		</script>
 	</body>
