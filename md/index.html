@@ -184,7 +184,9 @@ You can find this editor on [Github](https://github.com/pavlos256/util/tree/gh-p
 		smartLists: true,
 		highlight: function(code, lang) {
 			if (chkHighlight.checked && ("hljs" in window)) {
-				return (lang ? hljs.highlight(lang, code, false) : hljs.highlightAuto(code)).value;
+				try {
+					return (lang ? hljs.highlight(lang, code, false) : hljs.highlightAuto(code)).value;
+				} catch (e) { }
 			}
 			return code;
 		}
